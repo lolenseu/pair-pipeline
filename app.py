@@ -4,13 +4,11 @@ import requests
 from flask import Flask, jsonify, request
 from datetime import datetime
 
-
 # Variables
 app = Flask(__name__)
 
 parent_folder: str = './pipeline'
-megastream_forlder: str = './megastream'
-
+megastream_folder: str = './megastream'
 
 # Response Class
 class Response:
@@ -25,10 +23,9 @@ class Response:
         if data:
             response.update(data)
         return jsonify(response), 201
-    
 
 # Functions
-def create_id(pipeline_id: str, pipeline_key: str) -> bool:    
+def create_id(pipeline_id: str, pipeline_key: str) -> bool:
     hex_folder_name = hex(int(pipeline_id))
     folder_location = os.path.join(parent_folder, hex_folder_name)
     try:
@@ -47,7 +44,7 @@ def create_id(pipeline_id: str, pipeline_key: str) -> bool:
             return False
     except:
         return False
-        
+
 def confirm_id(pipeline_id: str) -> bool:
     hex_folder_name = hex(int(pipeline_id))
     folder_location = os.path.join(parent_folder, hex_folder_name)
@@ -58,7 +55,7 @@ def confirm_key(pipeline_id: str) -> str:
     folder_location = os.path.join(parent_folder, hex_folder_name)
     key_file_path = os.path.join(folder_location, 'key.txt')
     with open(key_file_path, 'r') as file:
-            file_key = file.read()
+        file_key = file.read()
     return file_key
 
 def data_available(pipeline_id: str) -> bool:
@@ -79,7 +76,7 @@ def read_data(pipeline_id: str) -> dict:
     folder_location = os.path.join(parent_folder, hex_folder_name)
     with open(os.path.join(folder_location, 'stream.json'), 'r') as f:
         return json.load(f)
-    
+
 def total_id() -> int:
     return len(os.listdir(parent_folder))
 
@@ -89,7 +86,6 @@ def get_public_ip() -> str:
         return response.json()['ip']
     except requests.RequestException:
         return 'Unable to get IP'
-
 
 # Routes
 @app.route('/', methods=['GET', 'POST'])
@@ -120,31 +116,30 @@ def pipeline():
         pipeline_id: str = request.args.get('id')
         pipeline_key: str = request.args.get('key')
         timestamp = datetime.now().isoformat()
-        response = {}
         
         # Check if pipeline_id is exactly 8 digits long
-        if len(pipeline_id) != 8 and pipeline_id.isdigit():
-            return Response.error('ID must be exactly 8 digits long', pipeline_id, timestamp)         
+        if len(pipeline_id) != 8 or not pipeline_id.isdigit():
+            return Response.error('ID must be exactly 8 digits long', pipeline_id, timestamp)
         
-        # check if pipeline_key
-        if len(pipeline_id) != 16 and pipeline_key != confirm_key(pipeline_id):
+        # Check if pipeline_key is correct
+        if len(pipeline_key) != 16 or pipeline_key != confirm_key(pipeline_id):
             return Response.error('Wrong key', pipeline_id, timestamp)
         
         # Check if pipeline_option is valid
         if pipeline_option == 'cre':
             if confirm_id(pipeline_id):
-                return Response.error('ID already exists', pipeline_id, timestamp)  
+                return Response.error('ID already exists', pipeline_id, timestamp)
             else:
                 create_id(pipeline_id, pipeline_key)
                 return Response.success('Pipeline created successfully', pipeline_id, timestamp)
         
         elif pipeline_option == 'snd':
-            if confirm_id(pipeline_id):  
+            if confirm_id(pipeline_id):
                 int_virtual_data: dict[str, int] = {}
                 str_virtual_data: dict[str, str] = {}
                 
                 # Populate int_virtual_data
-                for i in range(len(int_virtual_data)):
+                for i in range(1, 17):
                     key = f'ivd{i}'
                     value = request.args.get(key)
                     if value:
@@ -157,15 +152,14 @@ def pipeline():
                     return Response.error('Exceeded limit of 16 ivd values', pipeline_id, timestamp)
 
                 # Populate str_virtual_data
-                for i in range(len(str_virtual_data)):
-                        key = f'svd{i}'
-                        value = request.args.get(key)
-                        if value:
-                            if len(value) > 128:
-                                response = {'response': 'error!', 'error': f'String limit 128 characters for {key}'}
-                                return jsonify(response), 400
-                            str_virtual_data[key] = value
-                        
+                for i in range(1, 5):
+                    key = f'svd{i}'
+                    value = request.args.get(key)
+                    if value:
+                        if len(value) > 128:
+                            return Response.error(f'String limit 128 characters for {key}', pipeline_id, timestamp)
+                        str_virtual_data[key] = value
+                
                 # Check if the number of svd values exceeds the limit
                 if len(str_virtual_data) > 4:
                     return Response.error('Exceeded limit of 4 svd values', pipeline_id, timestamp)
@@ -183,7 +177,7 @@ def pipeline():
                     return Response.error('Data not stored', pipeline_id, timestamp)
             else:
                 return Response.error('ID not found', pipeline_id, timestamp)
-            
+        
         elif pipeline_option == 'rcv':
             if confirm_id(pipeline_id):
                 if data_available(pipeline_id):
@@ -197,8 +191,8 @@ def pipeline():
         else: 
             return Response.error('Invalid request', pipeline_id, timestamp)
         
-    except:
-        return Response.error('Internal server error', pipeline_id, timestamp)
+    except Exception as e:
+        return Response.error(f'Internal server error: {str(e)}', pipeline_id, timestamp)
 
 # Error Handling
 @app.errorhandler(404)
@@ -206,8 +200,7 @@ def page_not_found(e):
     timestamp = datetime.now().isoformat()
     return Response.error('Invalid request', '', timestamp)
 
-
 # Main
 if __name__ == '__main__':
-    app.run(debug=True) # disable debug in production
-    #app.run(host='0.0.0.0', port=5000)  # Change the port number if needed
+    app.run(debug=True)  # disable debug in production
+    # app.run(host='0.0.0.0', port=5000)  # Change the port number if needed
