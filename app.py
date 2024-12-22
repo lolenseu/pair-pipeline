@@ -14,7 +14,7 @@ megastream_folder: str = './megastream'
 class Response:
     @staticmethod
     def error(message: str, pipeline_id: str, timestamp: str) -> tuple:
-        response = {'response': 'error!', 'error': message, 'id': pipeline_id, 'timestamp': timestamp}
+        response = {'response': 'error!', 'message': message, 'id': pipeline_id, 'timestamp': timestamp}
         return jsonify(response), 400
 
     @staticmethod
@@ -80,7 +80,7 @@ def read_data(pipeline_id: str) -> dict:
 def total_id() -> int:
     return len(os.listdir(parent_folder))
 
-def get_public_ip() -> str:
+def get_server_public_ip() -> str:
     try:
         response = requests.get('https://api.ipify.org?format=json')
         return response.json()['ip']
@@ -96,13 +96,11 @@ def home():
 # Megastream
 @app.route('/megastream', methods=['GET', 'POST'])
 def megastream():
+    server_ip: str = get_server_public_ip()
     id: int = total_id()
-    server_ip: str = get_public_ip()
-    user_ip = request.remote_addr
     timestamp = datetime.now().isoformat()
     megasteam: dict = {
         'server_ip': server_ip,
-        'user_ip': user_ip,
         'total_id': id,
         'timestamp': timestamp
     }
@@ -121,9 +119,9 @@ def pipeline():
         if len(pipeline_id) != 8 or not pipeline_id.isdigit():
             return Response.error('ID must be exactly 8 digits long', pipeline_id, timestamp)
         
-        # Check if pipeline_key is correct
-        if len(pipeline_key) != 16 or pipeline_key != confirm_key(pipeline_id):
-            return Response.error('Wrong key', pipeline_id, timestamp)
+        # Check if pipeline_key
+        if len(pipeline_key) != 16:
+            return Response.error('Key must be exactly 16 string long', pipeline_id, timestamp)
         
         # Check if pipeline_option is valid
         if pipeline_option == 'cre':
@@ -135,6 +133,9 @@ def pipeline():
         
         elif pipeline_option == 'snd':
             if confirm_id(pipeline_id):
+                if pipeline_key != confirm_key(pipeline_id):
+                    return Response.error('Wrong key', pipeline_id, timestamp)
+                
                 int_virtual_data: dict[str, int] = {}
                 str_virtual_data: dict[str, str] = {}
                 
@@ -146,10 +147,6 @@ def pipeline():
                         if not value.isdigit() or int(value) > 9999:
                             return Response.error(f'Integer limit 4 digits for {key}', pipeline_id, timestamp)
                         int_virtual_data[key] = int(value)
-                
-                # Check if the number of ivd values exceeds the limit
-                if len(int_virtual_data) > 16:
-                    return Response.error('Exceeded limit of 16 ivd values', pipeline_id, timestamp)
 
                 # Populate str_virtual_data
                 for i in range(1, 5):
@@ -159,18 +156,17 @@ def pipeline():
                         if len(value) > 128:
                             return Response.error(f'String limit 128 characters for {key}', pipeline_id, timestamp)
                         str_virtual_data[key] = value
+                        
+                # Check if the number of ivd values exceeds the limit
+                if len(int_virtual_data) > 16:
+                    return Response.error('Exceeded limit of 16 ivd values', pipeline_id, timestamp)
                 
                 # Check if the number of svd values exceeds the limit
                 if len(str_virtual_data) > 4:
                     return Response.error('Exceeded limit of 4 svd values', pipeline_id, timestamp)
-                
-                data = {
-                    'int_virtual_data': int_virtual_data,
-                    'str_virtual_data': str_virtual_data,
-                    'timestamp': timestamp
-                }
 
                 if int_virtual_data or str_virtual_data:
+                    data = {'int_virtual_data': int_virtual_data, 'str_virtual_data': str_virtual_data}
                     store_data(pipeline_id, data)
                     return Response.success('Data stored successfully', pipeline_id, timestamp)
                 else:
@@ -180,6 +176,9 @@ def pipeline():
         
         elif pipeline_option == 'rcv':
             if confirm_id(pipeline_id):
+                if pipeline_key != confirm_key(pipeline_id):
+                    return Response.error('Wrong key', pipeline_id, timestamp)
+                
                 if data_available(pipeline_id):
                     data = read_data(pipeline_id)
                     return Response.success('Data retrieved successfully', pipeline_id, timestamp, {'stream': data})
