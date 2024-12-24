@@ -58,6 +58,13 @@ def confirm_key(pipeline_id: str) -> str:
         file_key = file.read()
     return file_key
 
+def update_key(pipeline_id: str, pipeline_new_key: str) -> None:
+    hex_folder_name = hex(int(pipeline_id))
+    folder_location = os.path.join(parent_folder, hex_folder_name)
+    key_file_path = os.path.join(folder_location, 'key.txt')
+    with open(key_file_path, 'w') as file:
+        file.write(pipeline_new_key)
+
 def data_available(pipeline_id: str) -> bool:
     hex_folder_name = hex(int(pipeline_id))
     file_path = os.path.join(parent_folder, hex_folder_name, 'stream.json')
@@ -113,6 +120,7 @@ def pipeline():
         pipeline_option: str = request.args.get('opt')
         pipeline_id: str = request.args.get('id')
         pipeline_key: str = request.args.get('key')
+        pipeline_new_key: str = request.args.get('nkey')
         timestamp = datetime.now().isoformat()
         
         # Check if pipeline_id is exactly 8 digits long
@@ -130,6 +138,17 @@ def pipeline():
             else:
                 create_id(pipeline_id, pipeline_key)
                 return Response.success('Pipeline created successfully', pipeline_id, timestamp)
+            
+        elif pipeline_option == 'upk':
+            if confirm_id(pipeline_id):
+                if pipeline_key != confirm_key(pipeline_id):
+                    return Response.error('Wrong key', pipeline_id, timestamp)
+                
+                if pipeline_new_key:
+                    update_key(pipeline_id, pipeline_new_key)
+                    return Response.success('Key updated successfully', pipeline_id, timestamp)
+            else:
+                return Response.error('ID not found', pipeline_id, timestamp)
         
         elif pipeline_option == 'snd':
             if confirm_id(pipeline_id):
