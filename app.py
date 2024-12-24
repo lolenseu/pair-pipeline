@@ -136,37 +136,37 @@ def pipeline():
                 if pipeline_key != confirm_key(pipeline_id):
                     return Response.error('Wrong key', pipeline_id, timestamp)
                 
-                int_virtual_data: dict[str, int] = {}
-                str_virtual_data: dict[str, str] = {}
+                int_data: dict[str, int] = {}
+                str_data: dict[str, str] = {}
                 
-                # Populate int_virtual_data
-                for i in range(1, 17):
-                    key = f'ivd{i}'
+                # Populate int_data
+                for i in range(1, 9):
+                    key = f'ivp{i}'
                     value = request.args.get(key)
                     if value:
                         if not value.isdigit() or int(value) > 9999:
                             return Response.error(f'Integer limit 4 digits for {key}', pipeline_id, timestamp)
-                        int_virtual_data[key] = int(value)
+                        int_data[key] = int(value)
 
-                # Populate str_virtual_data
+                # Populate str_data
                 for i in range(1, 5):
-                    key = f'svd{i}'
+                    key = f'svp{i}'
                     value = request.args.get(key)
                     if value:
                         if len(value) > 128:
                             return Response.error(f'String limit 128 characters for {key}', pipeline_id, timestamp)
-                        str_virtual_data[key] = value
+                        str_data[key] = value
                         
                 # Check if the number of ivd values exceeds the limit
-                if len(int_virtual_data) > 16:
-                    return Response.error('Exceeded limit of 16 ivd values', pipeline_id, timestamp)
+                if len(int_data) > 8:
+                    return Response.error('Exceeded limit of 8 ivp values', pipeline_id, timestamp)
                 
                 # Check if the number of svd values exceeds the limit
-                if len(str_virtual_data) > 4:
-                    return Response.error('Exceeded limit of 4 svd values', pipeline_id, timestamp)
+                if len(str_data) > 4:
+                    return Response.error('Exceeded limit of 4 svp values', pipeline_id, timestamp)
 
-                if int_virtual_data or str_virtual_data:
-                    data = {'int_virtual_data': int_virtual_data, 'str_virtual_data': str_virtual_data}
+                if int_data or str_data:
+                    data = {'int_virtual_pin': int_data, 'str_virtual_pin': str_data}
                     store_data(pipeline_id, data)
                     return Response.success('Data stored successfully', pipeline_id, timestamp)
                 else:
