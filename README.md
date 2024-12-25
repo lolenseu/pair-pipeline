@@ -2,7 +2,7 @@
 
 <br>
 
-![My Logo](images/iot.jpeg)
+![My Logo](image/iot.jpeg)
 
 <br>
 <br>
