@@ -187,9 +187,9 @@ def pipeline():
                 if int_data or str_data:
                     data = {'int_virtual_pin': int_data, 'str_virtual_pin': str_data}
                     store_data(pipeline_id, data)
-                    return Response.success('Data stored successfully', pipeline_id, timestamp)
+                    return Response.success('Data sent successfully', pipeline_id, timestamp)
                 else:
-                    return Response.error('Data not stored', pipeline_id, timestamp)
+                    return Response.error('Data not sent', pipeline_id, timestamp)
             else:
                 return Response.error('ID not found', pipeline_id, timestamp)
         
@@ -200,9 +200,9 @@ def pipeline():
                 
                 if data_available(pipeline_id):
                     data = read_data(pipeline_id)
-                    return Response.success('Data retrieved successfully', pipeline_id, timestamp, {'stream': data})
+                    return Response.success('Data received successfully', pipeline_id, timestamp, {'stream': data})
                 else:
-                    return Response.error('Data not retrieved', pipeline_id, timestamp)
+                    return Response.error('Data not received', pipeline_id, timestamp)
             else:
                 return Response.error('ID not found', pipeline_id, timestamp)
                        

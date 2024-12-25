@@ -1,4 +1,5 @@
 {
     "server_ip": "server_ip",
-    "total_id": "id"
+    "total_id": "id",
+    "timestamp": "timestamp"
 }
