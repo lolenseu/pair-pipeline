@@ -10,19 +10,21 @@ app = Flask(__name__)
 parent_folder: str = './pipeline'
 megastream_folder: str = './megastream'
 
+mem_data_stream:dict = {}
+
 # Response Class
 class Response:
-    @staticmethod
-    def error(message: str, pipeline_id: str, timestamp: str) -> tuple:
-        response = {'response': 'error!', 'message': message, 'id': pipeline_id, 'timestamp': timestamp}
-        return jsonify(response), 400
-
     @staticmethod
     def success(message: str, pipeline_id: str, timestamp: str, data: dict = None) -> tuple:
         response = {'response': 'success!', 'message': message, 'id': pipeline_id, 'timestamp': timestamp}
         if data:
             response.update(data)
         return jsonify(response), 201
+    
+    @staticmethod
+    def error(message: str, pipeline_id: str, timestamp: str) -> tuple:
+        response = {'response': 'error!', 'message': message, 'id': pipeline_id, 'timestamp': timestamp}
+        return jsonify(response), 400
 
 # Functions
 def create_id(pipeline_id: str, pipeline_key: str) -> bool:
@@ -95,26 +97,27 @@ def get_server_public_ip() -> str:
         return 'Unable to get IP'
 
 # Routes
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/pipeline', methods=['GET', 'POST'])
 def home():
-    response = {'message': 'Welcome to Pair-Pipeline!'}
+    timestamp = datetime.now().isoformat()
+    response = {'response': 'success!', 'message': 'Welcome to Pair-Pipeline!', 'timestamp': timestamp}
     return jsonify(response), 200
 
 # Megastream
-@app.route('/megastream', methods=['GET', 'POST'])
+@app.route('/pipeline/megastream', methods=['GET', 'POST'])
 def megastream():
     server_ip: str = get_server_public_ip()
     id: int = total_id()
     timestamp = datetime.now().isoformat()
-    megasteam: dict = {
+    response: dict = {
         'server_ip': server_ip,
         'total_id': id,
         'timestamp': timestamp
     }
-    return jsonify(megasteam), 200
+    return jsonify(response), 200
 
 # Pipeline
-@app.route('/pipeline', methods=['GET', 'POST'])
+@app.route('/pipeline/stream', methods=['GET', 'POST'])
 def pipeline():
     try:
         pipeline_option: str = request.args.get('opt')
@@ -151,7 +154,7 @@ def pipeline():
                 return Response.error('ID not found', pipeline_id, timestamp)
         
         elif pipeline_option == 'snd':
-            if confirm_id(pipeline_id):
+            if confirm_id(pipeline_id):                
                 if pipeline_key != confirm_key(pipeline_id):
                     return Response.error('Wrong key', pipeline_id, timestamp)
                 
@@ -175,7 +178,7 @@ def pipeline():
                         if len(value) > 128:
                             return Response.error(f'String limit 128 characters for {key}', pipeline_id, timestamp)
                         str_data[key] = value
-                        
+                
                 # Check if the number of ivd values exceeds the limit
                 if len(int_data) > 8:
                     return Response.error('Exceeded limit of 8 ivp values', pipeline_id, timestamp)
@@ -183,9 +186,10 @@ def pipeline():
                 # Check if the number of svd values exceeds the limit
                 if len(str_data) > 4:
                     return Response.error('Exceeded limit of 4 svp values', pipeline_id, timestamp)
-
+                
                 if int_data or str_data:
                     data = {'int_virtual_pin': int_data, 'str_virtual_pin': str_data}
+                    mem_data_stream[pipeline_id] = data
                     store_data(pipeline_id, data)
                     return Response.success('Data sent successfully', pipeline_id, timestamp)
                 else:
@@ -199,6 +203,7 @@ def pipeline():
                     return Response.error('Wrong key', pipeline_id, timestamp)
                 
                 if data_available(pipeline_id):
+                    # data = mem_data_stream[pipeline_id]
                     data = read_data(pipeline_id)
                     return Response.success('Data received successfully', pipeline_id, timestamp, {'stream': data})
                 else:
@@ -221,4 +226,4 @@ def page_not_found(e):
 # Main
 if __name__ == '__main__':
     app.run()  # Run the app
-    #app.run(debug=True)  # debug in production
+    #app.run(debug=True,port=5001)  # debug in production
