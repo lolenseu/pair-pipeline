@@ -88,11 +88,11 @@ You can test the live application hosted at [https://lolenseu.pythonanywhere.com
     - `nkey=abcdefghijklmnop` (16-character pipeline newkey)
 - **Example Request**:
     ```bash
-    https://lolenseu.pythonanywhere.com/pipeline/stream?opt=cre&id=12345678&key=abcdefghijklmnop&nkey=abcdefghijklmnop
+    https://lolenseu.pythonanywhere.com/pipeline/stream?opt=upk&id=12345678&key=abcdefghijklmnop&nkey=abcdefghijklmnop
     ```
 
     ```bash
-    curl -X POST "https://lolenseu.pythonanywhere.com/pipeline/stream?opt=cre&id=12345678&key=abcdefghijklmnop&nkey=abcdefghijklmnop"
+    curl -X POST "https://lolenseu.pythonanywhere.com/pipeline/stream?opt=upk&id=12345678&key=abcdefghijklmnop&nkey=abcdefghijklmnop"
     ```
 - **Response**:
     ```json
