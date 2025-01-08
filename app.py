@@ -215,7 +215,8 @@ def pipeline():
             return Response.error('Invalid request', pipeline_id, timestamp)
         
     except Exception as e:
-        return Response.error(f'Internal server error: {str(e)}', pipeline_id, timestamp)
+        return Response.error('Invalid request', pipeline_id, timestamp)
+        #return Response.error(f'Internal server error: {str(e)}', pipeline_id, timestamp)
 
 # Error Handling
 @app.errorhandler(404)
