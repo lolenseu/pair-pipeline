@@ -27,12 +27,12 @@ The application is live and accessible at: [https://lolenseu.pythonanywhere.com/
 
 ## Live Testing
 
-You can test the live application hosted at [https://lolenseu.pythonanywhere.com/](https://lolenseu.pythonanywhere.com/). Below are some example requests:
+You can test the live application hosted at [https://lolenseu.pythonanywhere.com/pipeline](https://lolenseu.pythonanywhere.com/pipeline). Below are some example requests:
 
 ### Example Requests
 
 #### Home Endpoint
-- **URL**: [https://lolenseu.pythonanywhere.com/](https://lolenseu.pythonanywhere.com/)
+- **URL**: [https://lolenseu.pythonanywhere.com/pipeline](https://lolenseu.pythonanywhere.com/pipeline)
 - **Method**: `GET`
 - **Response**:
     ```json
@@ -42,7 +42,7 @@ You can test the live application hosted at [https://lolenseu.pythonanywhere.com
     ```
 
 #### Megastream Endpoint
-- **URL**: [https://lolenseu.pythonanywhere.com/megastream](https://lolenseu.pythonanywhere.com/megastream)
+- **URL**: [https://lolenseu.pythonanywhere.com/pipeline/megastream](https://lolenseu.pythonanywhere.com/pipeline/megastream)
 - **Method**: `GET`
 - **Response**:
     ```json
@@ -54,7 +54,7 @@ You can test the live application hosted at [https://lolenseu.pythonanywhere.com
     ```
 
 #### Create Pipeline (`cre`)
-- **URL**: [https://lolenseu.pythonanywhere.com/pipeline](https://lolenseu.pythonanywhere.com/pipeline)
+- **URL**: [https://lolenseu.pythonanywhere.com/pipeline/stream](https://lolenseu.pythonanywhere.com/pipeline/stream)
 - **Method**: `POST`
 - **Query Parameters**:
     - `opt=cre`
@@ -62,11 +62,11 @@ You can test the live application hosted at [https://lolenseu.pythonanywhere.com
     - `key=abcdefghijklmnop` (16-character pipeline key)
 - **Example Request**:
     ```bash
-    https://lolenseu.pythonanywhere.com/pipeline?opt=cre&id=12345678&key=abcdefghijklmnop
+    https://lolenseu.pythonanywhere.com/pipeline/stream?opt=cre&id=12345678&key=abcdefghijklmnop
     ```
 
     ```bash
-    curl -X POST "https://lolenseu.pythonanywhere.com/pipeline?opt=cre&id=12345678&key=abcdefghijklmnop"
+    curl -X POST "https://lolenseu.pythonanywhere.com/pipeline/stream?opt=cre&id=12345678&key=abcdefghijklmnop"
     ```
 - **Response**:
     ```json
@@ -79,7 +79,7 @@ You can test the live application hosted at [https://lolenseu.pythonanywhere.com
     ```
 
 #### Update Key (`upk`)
-- **URL**: [https://lolenseu.pythonanywhere.com/pipeline](https://lolenseu.pythonanywhere.com/pipeline)
+- **URL**: [https://lolenseu.pythonanywhere.com/pipeline/stream](https://lolenseu.pythonanywhere.com/pipeline/stream)
 - **Method**: `POST`
 - **Query Parameters**:
     - `opt=upk`
@@ -88,11 +88,11 @@ You can test the live application hosted at [https://lolenseu.pythonanywhere.com
     - `nkey=abcdefghijklmnop` (16-character pipeline newkey)
 - **Example Request**:
     ```bash
-    https://lolenseu.pythonanywhere.com/pipeline?opt=cre&id=12345678&key=abcdefghijklmnop&nkey=abcdefghijklmnop
+    https://lolenseu.pythonanywhere.com/pipeline/stream?opt=cre&id=12345678&key=abcdefghijklmnop&nkey=abcdefghijklmnop
     ```
 
     ```bash
-    curl -X POST "https://lolenseu.pythonanywhere.com/pipeline?opt=cre&id=12345678&key=abcdefghijklmnop&nkey=abcdefghijklmnop"
+    curl -X POST "https://lolenseu.pythonanywhere.com/pipeline/stream?opt=cre&id=12345678&key=abcdefghijklmnop&nkey=abcdefghijklmnop"
     ```
 - **Response**:
     ```json
@@ -105,7 +105,7 @@ You can test the live application hosted at [https://lolenseu.pythonanywhere.com
     ```
 
 #### Send Data (`snd`)
-- **URL**: [https://lolenseu.pythonanywhere.com/pipeline](https://lolenseu.pythonanywhere.com/pipeline)
+- **URL**: [https://lolenseu.pythonanywhere.com/pipeline/stream](https://lolenseu.pythonanywhere.com/pipeline/stream)
 - **Method**: `POST`
 - **Query Parameters**:
   - `opt=snd` (required): Specifies the operation.
@@ -115,11 +115,11 @@ You can test the live application hosted at [https://lolenseu.pythonanywhere.com
   - `svp1`, `svp2`, ..., `svp4` (optional): String virtual pins (1-4, each max 128 characters).
 - **Example Request**:
     ```bash
-    https://lolenseu.pythonanywhere.com/pipeline?opt=snd&id=12345678&key=abcdefghijklmnop&ivp1=123&ivp2=456&svp1=hello&svp2=world
+    https://lolenseu.pythonanywhere.com/pipeline/stream?opt=snd&id=12345678&key=abcdefghijklmnop&ivp1=123&ivp2=456&svp1=hello&svp2=world
     ```
     
     ```bash
-    curl -X POST "https://lolenseu.pythonanywhere.com/pipeline?opt=snd&id=12345678&key=abcdefghijklmnop&ivp1=123&ivp2=456&svp1=hello&svp2=world"
+    curl -X POST "https://lolenseu.pythonanywhere.com/pipeline/stream?opt=snd&id=12345678&key=abcdefghijklmnop&ivp1=123&ivp2=456&svp1=hello&svp2=world"
     ```
 - **Response**:
     ```json
@@ -132,7 +132,7 @@ You can test the live application hosted at [https://lolenseu.pythonanywhere.com
     ```
 
 #### Retrieve Data (`rcv`)
-- **URL**: [https://lolenseu.pythonanywhere.com/pipeline](https://lolenseu.pythonanywhere.com/pipeline)
+- **URL**: [https://lolenseu.pythonanywhere.com/pipeline/stream](https://lolenseu.pythonanywhere.com/pipeline/stream)
 - **Method**: `POST`
 - **Query Parameters**:
     - `opt=rcv`
@@ -140,11 +140,11 @@ You can test the live application hosted at [https://lolenseu.pythonanywhere.com
     - `key=abcdefghijklmnop`
 - **Example Request**:
     ```bash
-    https://lolenseu.pythonanywhere.com/pipeline?opt=rcv&id=12345678&key=abcdefghijklmnop
+    https://lolenseu.pythonanywhere.com/pipeline/stream?opt=rcv&id=12345678&key=abcdefghijklmnop
     ```
 
     ```bash
-    curl -X POST "https://lolenseu.pythonanywhere.com/pipeline?opt=rcv&id=12345678&key=abcdefghijklmnop"
+    curl -X POST "https://lolenseu.pythonanywhere.com/pipeline/stream?opt=rcv&id=12345678&key=abcdefghijklmnop"
     ```
 - **Response**:
     ```json
@@ -208,7 +208,7 @@ You can test the live application hosted at [https://lolenseu.pythonanywhere.com
     ```
 
 #### Megastream
-- **URL**: `http://localhost:5000/megastream`
+- **URL**: `http://localhost:5000/pipeline/megastream`
 - **Method**: `GET, POST`
 - **Response**:
     ```json
@@ -220,7 +220,7 @@ You can test the live application hosted at [https://lolenseu.pythonanywhere.com
     ```
 
 #### Pipeline
-- **URL**: `http://localhost:5000/pipeline`
+- **URL**: `http://localhost:5000/pipeline/stream`
 - **Method**: `GET, POST`
 - **Query Parameters**:
   - `opt` (required): Operation type (`cre`, `upk`, `snd`, `rcv`)

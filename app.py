@@ -154,7 +154,7 @@ def pipeline():
                 return Response.error('ID not found', pipeline_id, timestamp)
         
         elif pipeline_option == 'snd':
-            if confirm_id(pipeline_id):                
+            if confirm_id(pipeline_id):
                 if pipeline_key != confirm_key(pipeline_id):
                     return Response.error('Wrong key', pipeline_id, timestamp)
                 
@@ -203,7 +203,7 @@ def pipeline():
                     return Response.error('Wrong key', pipeline_id, timestamp)
                 
                 if data_available(pipeline_id):
-                    # data = mem_data_stream[pipeline_id]
+                    #data = mem_data_stream[pipeline_id]
                     data = read_data(pipeline_id)
                     return Response.success('Data received successfully', pipeline_id, timestamp, {'stream': data})
                 else:
