@@ -37,7 +37,9 @@ You can test the live application hosted at [https://lolenseu.pythonanywhere.com
 - **Response**:
     ```json
     {
-        "message": "Welcome to Pair-Pipeline!"
+        "message": "Welcome to Pair-Pipeline!",
+        "response": "success!",
+        "timestamp": "<current_timestamp>"
     }
     ```
 
